@@ -18,19 +18,30 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  useEffect(() => {
+    axios.get(baseUrl)
+      .then(response => {
+        setResources(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching resources:', error)
+      })
+  }, [baseUrl])
 
-  const create = (resource) => {
-    // ...
+  const create = async (resource) => {
+    try {
+      const response = await axios.post(baseUrl, resource)
+      setResources([...resources, response.data])
+    } catch (error) {
+      console.error('Error creating resource:', error)
+    }
   }
 
   const service = {
     create
   }
 
-  return [
-    resources, service
-  ]
+  return [resources, service]
 }
 
 const App = () => {
@@ -45,7 +56,7 @@ const App = () => {
     event.preventDefault()
     noteService.create({ content: content.value })
   }
- 
+
   const handlePersonSubmit = (event) => {
     event.preventDefault()
     personService.create({ name: name.value, number: number.value})
